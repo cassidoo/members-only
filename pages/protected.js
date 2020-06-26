@@ -20,7 +20,7 @@ export default function Protected({ loggedIn }) {
 
       {loggedIn ? (
         <main>
-          <Header />
+          <Header text={'Welcome to the Private Space™'} />
           <p className="description">Wow, secrets are super cool.</p>
           <button
             onClick={() => {

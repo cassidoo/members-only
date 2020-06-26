@@ -1,5 +1,4 @@
-import { useEffect, useState } from 'react'
-import Router from 'next/router'
+import { useEffect } from 'react'
 import Head from 'next/head'
 
 import netlifyIdentity from 'netlify-identity-widget'
@@ -8,7 +7,7 @@ import netlifyAuth from '../netlifyAuth.js'
 import Header from '@components/Header'
 import Footer from '@components/Footer'
 
-export default function Home() {
+export default function Home({ loggedIn }) {
   useEffect(() => {
     window.netlifyIdentity = netlifyIdentity
     netlifyIdentity.init()
@@ -28,12 +27,21 @@ export default function Home() {
       </Head>
 
       <main>
-        <Header />
+        <Header text={'Welcome to the Public Space™'} />
         <p className="description">
           We are in a public space, for the people who aren't able to access the super fancy
           members-only area. You hear snobbish laughter in the distance.
         </p>
-        <button onClick={login}>Log in here to access the members-only area.</button>
+        {loggedIn ? (
+          <div>
+            You're logged in! Please do visit{' '}
+            <Link href="/">
+              <a>the special, members-only space.</a>
+            </Link>
+          </div>
+        ) : (
+          <button onClick={login}>Log in here to access the members-only area.</button>
+        )}
       </main>
 
       <Footer />
@@ -79,4 +87,12 @@ export default function Home() {
       `}</style>
     </div>
   )
+}
+
+export async function getStaticProps() {
+  return {
+    props: {
+      loggedIn: netlifyAuth.isAuthenticated,
+    },
+  }
 }
