@@ -9,6 +9,7 @@
     "export": "next export"
   },
   "dependencies": {
+    "netlify-identity-widget": "^1.6.0",
     "next": "9.4.0",
     "react": "16.13.1",
     "react-dom": "16.13.1"

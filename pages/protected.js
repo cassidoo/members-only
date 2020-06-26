@@ -1,24 +1,15 @@
-import { useEffect, useState } from 'react'
-import Router from 'next/router'
 import Head from 'next/head'
-
-import netlifyIdentity from 'netlify-identity-widget'
-import netlifyAuth from '../netlifyAuth.js'
+import Link from 'next/link'
+import Router from 'next/router'
 
 import Header from '@components/Header'
 import Footer from '@components/Footer'
 
-export default function Home() {
-  useEffect(() => {
-    window.netlifyIdentity = netlifyIdentity
-    netlifyIdentity.init()
-  }, [])
+import netlifyIdentity from 'netlify-identity-widget'
+import netlifyAuth from '../netlifyAuth.js'
 
-  let login = () => {
-    netlifyAuth.authenticate(() => {
-      console.log('logged in!')
-    })
-  }
+export default function Protected({ loggedIn }) {
+  const user = netlifyIdentity.currentUser()
 
   return (
     <div className="container">
@@ -27,14 +18,26 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main>
-        <Header />
-        <p className="description">
-          We are in a public space, for the people who aren't able to access the super fancy
-          members-only area. You hear snobbish laughter in the distance.
-        </p>
-        <button onClick={login}>Log in here to access the members-only area.</button>
-      </main>
+      {loggedIn ? (
+        <main>
+          <Header />
+          <p className="description">Wow, secrets are super cool.</p>
+          <button
+            onClick={() => {
+              netlifyAuth.signout(() => Router.push('/'))
+            }}
+          >
+            Log out.
+          </button>
+        </main>
+      ) : (
+        <main>
+          <p>YOU ARE NOT ALLOWED HERE.</p>
+          <Link href="/">
+            <a>Go back to the grody public space.</a>
+          </Link>
+        </main>
+      )}
 
       <Footer />
 
@@ -55,13 +58,6 @@ export default function Home() {
           justify-content: center;
           align-items: center;
         }
-
-        code {
-          background: #fafafa;
-          border-radius: 5px;
-          padding: 0.75rem;
-          font-family: Menlo, Monaco, Lucida Console, Courier New, monospace;
-        }
       `}</style>
 
       <style jsx global>{`
@@ -79,4 +75,12 @@ export default function Home() {
       `}</style>
     </div>
   )
+}
+
+export async function getStaticProps() {
+  return {
+    props: {
+      loggedIn: netlifyAuth.isAuthenticated,
+    },
+  }
 }
