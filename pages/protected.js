@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import Head from 'next/head'
 import Link from 'next/link'
 import Router from 'next/router'
@@ -8,8 +9,19 @@ import Footer from '@components/Footer'
 import netlifyIdentity from 'netlify-identity-widget'
 import netlifyAuth from '../netlifyAuth.js'
 
-export default function Protected({ loggedIn }) {
-  const user = netlifyIdentity.currentUser()
+export default function Protected() {
+  let [loggedIn, setLoggedIn] = useState(netlifyAuth.isAuthenticated)
+  let [user, setUser] = useState(null)
+
+  useEffect(() => {
+    window.netlifyIdentity = netlifyIdentity
+    netlifyIdentity.on('init', (user) => {
+      setLoggedIn(!!user)
+      setUser(user)
+    })
+
+    netlifyIdentity.init()
+  }, [netlifyAuth.isAuthenticated])
 
   return (
     <div className="container">
@@ -21,10 +33,15 @@ export default function Protected({ loggedIn }) {
       {loggedIn ? (
         <main>
           <Header text={'Welcome to the Private Space™'} />
-          <p className="description">Wow, secrets are super cool.</p>
+          <p className="description">
+            Wow, secrets are super cool. Welcome {user?.user_metadata.full_name}!
+          </p>
           <button
             onClick={() => {
-              netlifyAuth.signout(() => Router.push('/'))
+              netlifyAuth.signout(() => {
+                console.log('signed out')
+                Router.push('/')
+              })
             }}
           >
             Log out.
@@ -75,12 +92,4 @@ export default function Protected({ loggedIn }) {
       `}</style>
     </div>
   )
-}
-
-export async function getStaticProps() {
-  return {
-    props: {
-      loggedIn: netlifyAuth.isAuthenticated,
-    },
-  }
 }

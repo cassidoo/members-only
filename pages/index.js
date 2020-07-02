@@ -1,5 +1,6 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import Head from 'next/head'
+import Link from 'next/link'
 
 import netlifyIdentity from 'netlify-identity-widget'
 import netlifyAuth from '../netlifyAuth.js'
@@ -7,15 +8,22 @@ import netlifyAuth from '../netlifyAuth.js'
 import Header from '@components/Header'
 import Footer from '@components/Footer'
 
-export default function Home({ loggedIn }) {
+export default function Home() {
+  let [loggedIn, setLoggedIn] = useState(netlifyAuth.isAuthenticated)
+
   useEffect(() => {
     window.netlifyIdentity = netlifyIdentity
+    netlifyIdentity.on('init', (user) => {
+      setLoggedIn(!!user)
+    })
+
     netlifyIdentity.init()
-  }, [])
+  }, [loggedIn, netlifyIdentity])
 
   let login = () => {
-    netlifyAuth.authenticate(() => {
-      console.log('logged in!')
+    netlifyAuth.authenticate((user) => {
+      console.log('logged in!', user)
+      setLoggedIn(!!user)
     })
   }
 
@@ -35,7 +43,7 @@ export default function Home({ loggedIn }) {
         {loggedIn ? (
           <div>
             You're logged in! Please do visit{' '}
-            <Link href="/">
+            <Link href="/protected">
               <a>the special, members-only space.</a>
             </Link>
           </div>
@@ -87,12 +95,4 @@ export default function Home({ loggedIn }) {
       `}</style>
     </div>
   )
-}
-
-export async function getStaticProps() {
-  return {
-    props: {
-      loggedIn: netlifyAuth.isAuthenticated,
-    },
-  }
 }
