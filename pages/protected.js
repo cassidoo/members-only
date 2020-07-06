@@ -1,12 +1,10 @@
 import { useState, useEffect } from 'react'
 import Head from 'next/head'
 import Link from 'next/link'
-import Router from 'next/router'
 
 import Header from '@components/Header'
 import Footer from '@components/Footer'
 
-import netlifyIdentity from 'netlify-identity-widget'
 import netlifyAuth from '../netlifyAuth.js'
 
 export default function Protected() {
@@ -14,14 +12,11 @@ export default function Protected() {
   let [user, setUser] = useState(null)
 
   useEffect(() => {
-    window.netlifyIdentity = netlifyIdentity
-    netlifyIdentity.on('init', (user) => {
+    netlifyAuth.initialize((user) => {
       setLoggedIn(!!user)
       setUser(user)
     })
-
-    netlifyIdentity.init()
-  }, [netlifyAuth.isAuthenticated])
+  }, [])
 
   return (
     <div className="container">
@@ -39,8 +34,8 @@ export default function Protected() {
           <button
             onClick={() => {
               netlifyAuth.signout(() => {
-                console.log('signed out')
-                Router.push('/')
+                setLoggedIn(false)
+                setUser(null)
               })
             }}
           >

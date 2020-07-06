@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import Head from 'next/head'
 import Link from 'next/link'
 
-import netlifyIdentity from 'netlify-identity-widget'
 import netlifyAuth from '../netlifyAuth.js'
 
 import Header from '@components/Header'
@@ -12,17 +11,13 @@ export default function Home() {
   let [loggedIn, setLoggedIn] = useState(netlifyAuth.isAuthenticated)
 
   useEffect(() => {
-    window.netlifyIdentity = netlifyIdentity
-    netlifyIdentity.on('init', (user) => {
+    netlifyAuth.initialize((user) => {
       setLoggedIn(!!user)
     })
-
-    netlifyIdentity.init()
-  }, [loggedIn, netlifyIdentity])
+  }, [])
 
   let login = () => {
     netlifyAuth.authenticate((user) => {
-      console.log('logged in!', user)
       setLoggedIn(!!user)
     })
   }
