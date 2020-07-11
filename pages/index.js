@@ -11,9 +11,17 @@ export default function Home() {
   let [loggedIn, setLoggedIn] = useState(netlifyAuth.isAuthenticated)
 
   useEffect(() => {
+    let isCurrent = true
     netlifyAuth.initialize((user) => {
-      setLoggedIn(!!user)
+      if (isCurrent) {
+        setLoggedIn(!!user)
+      }
     })
+
+    return () => {
+      isCurrent = false
+      netlifyAuth.cleanupEvents()
+    }
   }, [])
 
   let login = () => {

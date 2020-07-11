@@ -12,10 +12,18 @@ export default function Protected() {
   let [user, setUser] = useState(null)
 
   useEffect(() => {
+    let isCurrent = true
     netlifyAuth.initialize((user) => {
-      setLoggedIn(!!user)
-      setUser(user)
+      if (isCurrent) {
+        setLoggedIn(!!user)
+        setUser(user)
+      }
     })
+
+    return () => {
+      isCurrent = false
+      netlifyAuth.cleanupEvents()
+    }
   }, [])
 
   return (
