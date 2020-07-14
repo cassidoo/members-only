@@ -22,7 +22,6 @@ export default function Protected() {
 
     return () => {
       isCurrent = false
-      netlifyAuth.cleanupEvents()
     }
   }, [])
 

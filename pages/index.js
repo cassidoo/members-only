@@ -20,7 +20,6 @@ export default function Home() {
 
     return () => {
       isCurrent = false
-      netlifyAuth.cleanupEvents()
     }
   }, [])
 

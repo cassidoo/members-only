@@ -27,11 +27,6 @@ const netlifyAuth = {
       callback()
     })
   },
-  cleanupEvents() {
-    console.log('cleanup')
-    // netlifyIdentity.off('login')
-    // netlifyIdentity.off('logout')
-  },
 }
 
 export default netlifyAuth
